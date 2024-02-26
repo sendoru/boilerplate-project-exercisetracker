@@ -98,6 +98,9 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     let _id = req.params['_id'];
     let description = req.body['description'];
     let duration = req.body['duration'];
+
+    // new Date()).toDateString() is some kind of round down.
+    // By this, we can make all date value have 00:00:00 in HH:MM:SS field, and prevent some error in '/api/users/:_id/logs?' query
     let date = new Date((new Date()).toDateString());
 
     // 필수 필드 확인
