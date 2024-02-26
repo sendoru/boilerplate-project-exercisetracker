@@ -98,7 +98,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     let _id = req.params['_id'];
     let description = req.body['description'];
     let duration = req.body['duration'];
-    let date = new Date();
+    let date = new Date((new Date()).toDateString());
 
     // 필수 필드 확인
     if (_id == undefined || description == undefined || duration == undefined) {
@@ -107,7 +107,7 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
         })
     }
 
-    if (req.body['date'] != '') {
+    if (req.body['date'] != '' && req.body['date'] != undefined) {
         date = new Date(req.body['date']);
     }
 
@@ -159,20 +159,24 @@ app.get('/api/users/:_id/logs?', async (req, res) => {
     res_json["_id"] = req.params["_id"]
 
     var exercisemodel_query = {"userid": req.params["_id"]}
+    console.log(req.params)
 
-    if (req.params['from'] != undefined || req.params['to'] != undefined) {
+    if (req.query.from != undefined || req.query.to != undefined) {
         exercisemodel_query["date"] = {}
     }
-    if (req.params['from'] != undefined) {
-        exercisemodel_query["date"][$get] = new Date(req.params['from'])
+    if (req.query.from != undefined) {
+        exercisemodel_query["date"]["$gte"] = new Date(req.query.from)
     }
-    if (req.params['to'] != undefined) {
-        exercisemodel_query["date"][$let] = new Date(req.params['to'])
+    if (req.query.to != undefined) {
+        exercisemodel_query["date"]["$lte"] = new Date(req.query.to)
     }
 
     let exercise_doc = await ExerciseModel.find(exercisemodel_query)
 
-    var limit = req.params['limit'] == undefined ? exercise_doc.length : min(doc.length, req.params['limit'])
+    var limit = exercise_doc.length
+    if (req.query['limit'] != undefined && req.query['limit'] < limit) {
+        limit = req.query['limit']
+    }
 
     res_json["count"] = limit
 
