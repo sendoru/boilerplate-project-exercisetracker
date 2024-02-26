@@ -1,2 +1,5 @@
 .env
 node_modules
+rootca.key
+rootca.csr
+rootca.crt
